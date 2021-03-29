@@ -1,7 +1,7 @@
 import requests
 
-
 from marmython.parser import RecipeParser
+from marmython.serialize.toml import dumps, loads
 
 
 class MarmitonSession(requests.Session):
@@ -31,7 +31,9 @@ class MarmitonSession(requests.Session):
 
 
 def fmtprint(recipe):
-    print(f"{recipe.title.upper()}\n")
+    print(f"{recipe.title.upper()} ({recipe.note}/5)")
+    print(f"by {recipe.author}")
+    print(f"for {recipe.people} people\n")
 
     print("--- USTENSILES")
     for utensil in recipe.utensils:
@@ -43,14 +45,14 @@ def fmtprint(recipe):
 
     print("\n")
     for step in recipe.steps:
-        print(f"- {step.name}\n{step.content}\n")
+        print(f"({step.num}) {step.name}\n{step.content}\n")
 
 
 def main():
     parser = RecipeParser()
     session = MarmitonSession()
     parser.feed(session.get_random().text)
-    parser.recipe
+    print(parser.recipe)
 
 
 def test():
@@ -58,8 +60,9 @@ def test():
     with open("samples/saladehomard.html", "r") as f:
         parser.feed(f.read())
     fmtprint(parser.recipe)
+    print(dumps(parser.recipe))
 
 
 if __name__ == "__main__":
-    # main()
-    test()
+    main()
+    # test()
